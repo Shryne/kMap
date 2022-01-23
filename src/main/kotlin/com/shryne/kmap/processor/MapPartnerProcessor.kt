@@ -1,9 +1,10 @@
 package com.shryne.kmap.processor
 
+import com.shryne.kmap.annotation.KMap
 import com.shryne.kmap.annotation.MapPartner
-import com.shryne.kmap.annotation.kMap
+import com.shryne.kmap.processor.creation.InformedKMap
 import com.shryne.kmap.processor.creation.MapFile
-import com.squareup.kotlinpoet.asTypeName
+import com.shryne.kmap.processor.creation.Source
 import javax.annotation.processing.AbstractProcessor
 import javax.annotation.processing.RoundEnvironment
 import javax.annotation.processing.SupportedAnnotationTypes
@@ -30,11 +31,12 @@ class MapPartnerProcessor : AbstractProcessor() {
                     "With MapPartner annotated element is: $source."
                 )
                 if (source is TypeElement) {
+                    val mapPartner =  source.getAnnotation(
+                        MapPartner::class.java
+                    )
                     try {
-                        source.getAnnotation(
-                            MapPartner::class.java
-                        ).value
-                        // Getting class values is a little bit complicated,
+                        mapPartner.value
+                        // Getting class values is a little complicated,
                         //  because at this point they don't exist. They are to be
                         //  compiled. Forcing a MirroredTypeException is a trick
                         //  to work with it. See https://area-51.blog/2009/02/13/getting-class-values-from-annotations-in-an-annotationprocessor/
@@ -47,29 +49,32 @@ class MapPartnerProcessor : AbstractProcessor() {
                             Diagnostic.Kind.NOTE,
                             "Map partner of $source is $target."
                         )
-
-                        val sourceType = source.asType().asTypeName()
-                        val targetType = target.asType().asTypeName()
-
-                        val mappings = source.enclosedElements.filter {
-                            it.getAnnotation(kMap::class.java) != null
-                        }.map {
-                            it.getAnnotation(
-                                kMap::class.java
-                            ).value.run {
-                                if (this == "") {
-                                    it.simpleName.toString()
-                                } else {
-                                    this
-                                }
-                            } to it.simpleName.toString()
-                        }
-                        MapFile(sourceType, targetType, mappings).writeTo(
-                            processingEnv.filer
+                        processingEnv.messager.printMessage(
+                            Diagnostic.Kind.NOTE,
+                            "Source type is: ${source.simpleName}."
                         )
-                        MapFile(targetType, sourceType, mappings).writeTo(
-                            processingEnv.filer
+                        processingEnv.messager.printMessage(
+                            Diagnostic.Kind.NOTE,
+                            "Target type is: ${target.simpleName}"
                         )
+
+                        val kMaps = source.enclosedElements.filter {
+                            it.getAnnotation(KMap::class.java) != null
+                        }.map { InformedKMap(it, target) }
+
+                        MapFile(
+                            source,
+                            target,
+                            mapPartner,
+                            kMaps.map { it.sourceToTargetAssignment() }
+                        ).writeTo(processingEnv.filer)
+
+                        MapFile(
+                            target,
+                            source,
+                            mapPartner,
+                            kMaps.map { it.targetToSourceAssignment() }
+                        ).writeTo(processingEnv.filer)
                     }
                 }
             }

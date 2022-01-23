@@ -1,8 +1,11 @@
 package com.shryne.kmap.processor.creation
 
+import com.shryne.kmap.annotation.MapPartner
+import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.TypeName
 import javax.annotation.processing.Filer
+import javax.lang.model.element.TypeElement
 
 /**
  * The file that will contain the mapping methods. Example (pseudocode):
@@ -22,14 +25,17 @@ import javax.annotation.processing.Filer
  *  target.
  */
 class MapFile(
-    private val source: TypeName,
-    private val target: TypeName,
-    private val mappings: Iterable<Pair<String, String>>
+    private val source: TypeElement,
+    private val target: TypeElement,
+    private val mapPartner: MapPartner,
+    private val statements: Iterable<String>
 ) {
     fun writeTo(filer: Filer) {
-        FileSpec.builder("", "${source}Mapping")
+        // TODO: What if two classes have the same name and the default package is
+        //  used? => Collision
+        FileSpec.builder(mapPartner.packageName, "${source.simpleName}Mapping")
             .addFunction(
-            MapMethod(source, target, mappings).asFun()
+            MapMethod(source, target, statements).asFun()
         ).build().apply {
             writeTo(System.out)
             writeTo(filer)

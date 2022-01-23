@@ -1,7 +1,9 @@
 package com.shryne.kmap.processor.creation
 
+import com.shryne.kmap.annotation.KMap
 import com.squareup.kotlinpoet.FunSpec
-import com.squareup.kotlinpoet.TypeName
+import com.squareup.kotlinpoet.asClassName
+import javax.lang.model.element.TypeElement
 
 /**
  * The method that is going to do the mapping. It will look similar to this:
@@ -15,19 +17,17 @@ import com.squareup.kotlinpoet.TypeName
  * @param source
  */
 class MapMethod(
-    private val source: TypeName,
-    private val target: TypeName,
-    private val mappings: Iterable<Pair<String, String>>
+    private val source: TypeElement,
+    private val target: TypeElement,
+    private val statements: Iterable<String>
 ) {
     fun asFun(): FunSpec =
-        FunSpec.builder("to${target}")
-            .receiver(source)
-            .returns(target)
-            .beginControlFlow("return $target().also")
+        FunSpec.builder("to${target.simpleName}")
+            .receiver(source.asClassName())
+            .returns(target.asClassName())
+            .beginControlFlow("return ${target.simpleName}().also")
             .apply {
-                mappings.forEach {
-                    addStatement("it.${it.first} = ${it.second}")
-                }
+                statements.forEach(::addStatement)
             }
             .endControlFlow()
             .build()

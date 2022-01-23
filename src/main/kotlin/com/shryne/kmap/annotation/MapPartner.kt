@@ -11,5 +11,10 @@ annotation class MapPartner(
     /**
      * The class to be mapped with.
      */
-    val value: KClass<*>
+    val value: KClass<*>,
+
+    /**
+     * The package name of the generated mapping files.
+     */
+    val packageName: String = "com.shryne.kmap.mapping"
 )
