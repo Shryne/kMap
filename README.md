@@ -5,8 +5,8 @@ Take for example these two classes:
 ```kotlin
 @MapPartner(Dimension::class)
 class Size {                                    class Dimension {
-  @kMap var w: Int = 0                            var w: Int = 0
-  @kMap var h: Int = 0                            var h: Int = 0
+  @KMap var w: Int = 0                            var w: Int = 0
+  @KMap var h: Int = 0                            var h: Int = 0
 }                                               }
 ```
 
