@@ -1,9 +1,7 @@
 package com.shryne.kmap.processor.creation
 
 import com.shryne.kmap.annotation.MapPartner
-import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
-import com.squareup.kotlinpoet.TypeName
 import javax.annotation.processing.Filer
 import javax.lang.model.element.TypeElement
 
@@ -35,7 +33,7 @@ class MapFile(
         //  used? => Collision
         FileSpec.builder(mapPartner.packageName, "${source.simpleName}Mapping")
             .addFunction(
-            MapMethod(source, target, statements).asFun()
+            MapFunction(source, target, statements).asFun()
         ).build().apply {
             writeTo(System.out)
             writeTo(filer)

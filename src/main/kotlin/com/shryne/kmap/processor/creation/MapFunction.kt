@@ -16,7 +16,7 @@ import javax.lang.model.element.TypeElement
  * ```
  * @param source
  */
-class MapMethod(
+class MapFunction(
     private val source: TypeElement,
     private val target: TypeElement,
     private val statements: Iterable<String>
