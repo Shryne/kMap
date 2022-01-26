@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test
 
 class ObjectTest {
     @Test
-    fun differentAccessorOtherGet() {
+    fun map() {
         assertMappingFiles(
             "/object",
             Kotlin("Dimension"),

@@ -5,6 +5,7 @@ import com.shryne.kmap.annotation.MapPartner
 import com.shryne.kmap.processor.creation.InformedKMap
 import com.shryne.kmap.processor.creation.MapFile
 import com.shryne.kmap.processor.creation.Source
+import com.squareup.kotlinpoet.asClassName
 import javax.annotation.processing.AbstractProcessor
 import javax.annotation.processing.RoundEnvironment
 import javax.annotation.processing.SupportedAnnotationTypes
@@ -60,7 +61,7 @@ class MapPartnerProcessor : AbstractProcessor() {
 
                         val kMaps = source.enclosedElements.filter {
                             it.getAnnotation(KMap::class.java) != null
-                        }.map { InformedKMap(it, target) }
+                        }.map { InformedKMap(it, source, target, processingEnv.typeUtils) }
 
                         MapFile(
                             source,
