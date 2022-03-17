@@ -2,6 +2,8 @@ package com.shryne.kmap.annotation
 
 import kotlin.reflect.KClass
 
+const val DEFAULT_PACKAGE_NAME = "com.shryne.kmap.mapping"
+
 /**
  * Defines the class that the annotated class is needed to be mapped with.
  */
@@ -16,5 +18,5 @@ annotation class MapPartner(
     /**
      * The package name of the generated mapping files.
      */
-    val packageName: String = "com.shryne.kmap.mapping"
+    val packageName: String = DEFAULT_PACKAGE_NAME
 )

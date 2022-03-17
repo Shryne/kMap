@@ -4,9 +4,20 @@ import org.junit.jupiter.api.Test
 
 class ObjectTest {
     @Test
-    fun map() {
+    fun samePackage() {
         assertMappingFiles(
-            "/object",
+            "/object/same_package",
+            Kotlin("Dimension"),
+            Kotlin("Size"),
+            Kotlin("Scalar"),
+            Kotlin("Value")
+        )
+    }
+
+    @Test
+    fun differentTargetPackage() {
+        assertMappingFiles(
+            "/object/different_target_package",
             Kotlin("Dimension"),
             Kotlin("Size"),
             Kotlin("Scalar"),
