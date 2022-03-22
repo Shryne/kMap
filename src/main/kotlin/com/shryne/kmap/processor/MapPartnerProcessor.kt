@@ -32,7 +32,7 @@ class MapPartnerProcessor : AbstractProcessor() {
                     "With MapPartner annotated element is: $source."
                 )
                 if (source is TypeElement) {
-                    val mapPartner =  source.getAnnotation(
+                    val mapPartner = source.getAnnotation(
                         MapPartner::class.java
                     )
                     try {
@@ -61,7 +61,14 @@ class MapPartnerProcessor : AbstractProcessor() {
 
                         val kMaps = source.enclosedElements.filter {
                             it.getAnnotation(KMap::class.java) != null
-                        }.map { InformedKMap(it, source, target, processingEnv.typeUtils) }
+                        }.map {
+                            InformedKMap(
+                                it,
+                                source,
+                                target,
+                                processingEnv.typeUtils
+                            )
+                        }
 
                         MapFile(
                             source,

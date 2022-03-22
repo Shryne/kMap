@@ -6,11 +6,12 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="consoleApp" />
+        <module name="kMap" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="consoleApp" target="1.5" />
+      <module name="kMap" target="1.5" />
     </bytecodeTargetLevel>
   </component>
 </project>

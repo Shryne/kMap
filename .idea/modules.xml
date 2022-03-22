@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/consoleApp.iml" filepath="$PROJECT_DIR$/consoleApp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/kMap.iml" filepath="$PROJECT_DIR$/kMap.iml" />
     </modules>
   </component>
 </project>
