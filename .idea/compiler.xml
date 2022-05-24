@@ -11,7 +11,7 @@
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="consoleApp" target="1.5" />
-      <module name="kMap" target="1.8" />
+      <module name="kMap" target="15" />
     </bytecodeTargetLevel>
   </component>
 </project>

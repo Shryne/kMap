@@ -1,5 +1,6 @@
 package com.shryne.kmap.processor.creation
 
+import com.shryne.kmap.annotation.KMap
 import com.shryne.kmap.annotation.MapPartner
 import com.squareup.kotlinpoet.FileSpec
 import javax.annotation.processing.Filer
@@ -26,17 +27,25 @@ class MapFile(
     private val source: TypeElement,
     private val target: TypeElement,
     private val mapPartner: MapPartner,
-    private val statements: Iterable<String>
+    private val statements: Iterable<String>,
+    private val additionalImports: Iterable<Pair<String, String>>
 ) {
     fun writeTo(filer: Filer) {
         // TODO: What if two classes have the same name and the default package is
         //  used? => Collision
         FileSpec.builder(mapPartner.packageName, "${source.simpleName}Mapping")
+            .apply {
+                additionalImports.forEach {
+                    if (it.first != mapPartner.packageName) {
+                        addImport(it.first, it.second)
+                    }
+                }
+            }
             .addFunction(
-            MapFunction(source, target, statements).asFun()
-        ).build().apply {
-            writeTo(System.out)
-            writeTo(filer)
-        }
+                MapFunction(source, target, statements).asFun()
+            ).build().apply {
+                writeTo(System.out)
+                writeTo(filer)
+            }
     }
 }

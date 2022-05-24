@@ -18,7 +18,7 @@ import javax.tools.Diagnostic
 /**
  * Processor for [MapPartner].
  */
-@SupportedSourceVersion(SourceVersion.RELEASE_8)
+@SupportedSourceVersion(SourceVersion.RELEASE_15)
 @SupportedAnnotationTypes("com.shryne.kmap.annotation.MapPartner")
 class MapPartnerProcessor : AbstractProcessor() {
     override fun process(
@@ -74,14 +74,18 @@ class MapPartnerProcessor : AbstractProcessor() {
                             source,
                             target,
                             mapPartner,
-                            kMaps.map { it.sourceToTargetAssignment() }
+                            kMaps.map { it.sourceToTargetAssignment() },
+                            kMaps.filter { it.sourceToTargetImport != null }
+                                .map { it.sourceToTargetImport!! }
                         ).writeTo(processingEnv.filer)
 
                         MapFile(
                             target,
                             source,
                             mapPartner,
-                            kMaps.map { it.targetToSourceAssignment() }
+                            kMaps.map { it.targetToSourceAssignment() },
+                            kMaps.filter { it.targetToSourceImport != null }
+                                .map { it.targetToSourceImport!! }
                         ).writeTo(processingEnv.filer)
                     }
                 }
