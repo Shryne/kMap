@@ -9,13 +9,13 @@ import kotlin.test.assertEquals
 interface Source {
     val name: String
     val fileName: String
-
-    fun fileFromResources(path: String): File =
-        File(Source::class.java.getResource(path).toURI())
-
-    fun sourceCodeFromResources(path: String): String =
-        fileFromResources(path).readText()
 }
+
+fun fileFromResources(path: String): File =
+    File(Source::class.java.getResource(path).toURI())
+
+fun sourceCodeFromResources(path: String): String =
+    fileFromResources(path).readText()
 
 class Java(override val name: String) : Source {
     override val fileName: String = "$name.java"
@@ -23,23 +23,41 @@ class Java(override val name: String) : Source {
 
 class Kotlin(override val name: String) : Source {
     override val fileName: String = "$name.kt"
-
-    override fun fileFromResources(path: String): File =
-        File(Source::class.java.getResource(path).toURI())
-
-    override fun sourceCodeFromResources(path: String): String =
-        fileFromResources(path).readText()
 }
 
-fun assertMappingFiles(sourceFolder: String, vararg sources: Source) {
-    val sourceFiles = sources.map {
-        SourceFile.fromPath(
-            it.fileFromResources("$sourceFolder/${it.fileName}")
-        )
-    }
+fun assertMappingFiles(
+    sourceFolder: String,
+    vararg sources: Source,
+    nonMappingSources: Iterable<Source> = emptyList(),
+): Unit =
+    assertMappingFiles(sourceFolder, listOf(*sources), nonMappingSources)
 
+fun assertMappingFiles(
+    sourceFolder: String,
+    sources: Iterable<Source>,
+    nonMappingSources: Iterable<Source> = emptyList(),
+): Unit =
+    assertMappingFiles(sourceFolder, sources.map { "${it.name}Mapping" }, sources = sources, nonMappingSources)
+
+fun assertMappingFiles(
+    sourceFolder: String,
+    sourceMapFiles: Iterable<String>,
+    vararg sources: Source,
+    nonMappingSources: Iterable<Source> = emptyList(),
+) = assertMappingFiles(sourceFolder, sourceMapFiles, listOf(*sources), nonMappingSources)
+
+fun assertMappingFiles(
+    sourceFolder: String,
+    sourceMapFiles: Iterable<String>,
+    sources: Iterable<Source>,
+    nonMappingSources: Iterable<Source> = emptyList(),
+) {
     val result = KotlinCompilation().also {
-        it.sources = sourceFiles.toMutableList()
+        it.sources = (sources + nonMappingSources).map {
+            SourceFile.fromPath(
+                fileFromResources("$sourceFolder/${it.fileName}")
+            )
+        }
         it.annotationProcessors = listOf(MapPartnerProcessor())
         it.inheritClassPath = true
         it.messageOutputStream = System.out
@@ -47,14 +65,15 @@ fun assertMappingFiles(sourceFolder: String, vararg sources: Source) {
 
     assertEquals(KotlinCompilation.ExitCode.OK, result.exitCode)
 
-    sources.forEach { source ->
+    sourceMapFiles.forEach { file ->
+        println("File: $file.")
         Assertions.assertThat(
             result.sourcesGeneratedByAnnotationProcessor.find {
-                it.name == "${source.name}Mapping.kt"
+                it.name == "$file.kt"
             }!!.readText()
         ).containsIgnoringWhitespaces(
-            source.sourceCodeFromResources(
-                "$sourceFolder/${source.name}Mapping.kt"
+            sourceCodeFromResources(
+                "$sourceFolder/$file.kt"
             )
         )
     }

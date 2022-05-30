@@ -26,4 +26,14 @@ class BasicTest {
     fun multiplePropertiesSameName() {
         assertMappingFiles("/basic/multiple_properties_same_name", Kotlin("Client"), Kotlin("User"))
     }
+
+    @Test
+    fun sameClassName() {
+        assertMappingFiles("/basic/same_class_name", listOf("SUserMapping", "TUserMapping"), Kotlin("/other/User"), Kotlin("User"))
+    }
+
+    @Test
+    fun internalInTarget() {
+        assertMappingFiles("/basic/internal_in_target", listOf(Kotlin("Client"), Kotlin("User")), listOf(Kotlin("Wrapper")))
+    }
 }
