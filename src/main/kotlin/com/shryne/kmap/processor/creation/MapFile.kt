@@ -28,12 +28,20 @@ class MapFile(
     private val target: TypeElement,
     private val mapPartner: MapPartner,
     private val statements: Iterable<String>,
-    private val additionalImports: Iterable<Pair<String, String>>
+    private val additionalImports: Iterable<Pair<String, String>>,
+    direction: DIRECTION,
 ) {
+    private val fileName = if (source.simpleName == target.simpleName) {
+        when (direction) {
+            DIRECTION.SOURCE -> "S"
+            DIRECTION.TARGET -> "T"
+        }
+    } else {
+        ""
+    } + "${source.simpleName}Mapping"
+
     fun writeTo(filer: Filer) {
-        // TODO: What if two classes have the same name and the default package is
-        //  used? => Collision
-        FileSpec.builder(mapPartner.packageName, "${source.simpleName}Mapping")
+        FileSpec.builder(mapPartner.packageName, fileName)
             .apply {
                 additionalImports.forEach {
                     if (it.first != mapPartner.packageName) {
@@ -48,4 +56,9 @@ class MapFile(
                 writeTo(filer)
             }
     }
+}
+
+enum class DIRECTION {
+    SOURCE,
+    TARGET
 }

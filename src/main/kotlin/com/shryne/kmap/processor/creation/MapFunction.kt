@@ -19,13 +19,20 @@ import javax.lang.model.element.TypeElement
 class MapFunction(
     private val source: TypeElement,
     private val target: TypeElement,
-    private val statements: Iterable<String>
+    private val statements: Iterable<String>,
 ) {
+    private val returnType: String = if (source.simpleName.toString() == target.simpleName.toString()) {
+        target.asClassName().toString()
+        target.simpleName.toString()
+    } else {
+        target.simpleName.toString()
+    }
+
     fun asFun(): FunSpec =
         FunSpec.builder("to${target.simpleName}")
             .receiver(source.asClassName())
             .returns(target.asClassName())
-            .beginControlFlow("return ${target.simpleName}().also")
+            .beginControlFlow("return %T().also", target.asClassName())
             .apply {
                 statements.forEach(::addStatement)
             }

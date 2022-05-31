@@ -70,11 +70,11 @@ fun assertMappingFiles(
         Assertions.assertThat(
             result.sourcesGeneratedByAnnotationProcessor.find {
                 it.name == "$file.kt"
-            }!!.readText()
-        ).containsIgnoringWhitespaces(
-            sourceCodeFromResources(
-                "$sourceFolder/$file.kt"
+            }?.readText() ?: throw IllegalStateException(
+                "Generated $file.kt couldn't be found."
             )
+        ).containsIgnoringWhitespaces(
+            sourceCodeFromResources("$sourceFolder/$file.kt")
         )
     }
 }

@@ -2,6 +2,7 @@ package com.shryne.kmap.processor
 
 import com.shryne.kmap.annotation.KMap
 import com.shryne.kmap.annotation.MapPartner
+import com.shryne.kmap.processor.creation.DIRECTION
 import com.shryne.kmap.processor.creation.InformedKMap
 import com.shryne.kmap.processor.creation.MapFile
 import com.shryne.kmap.processor.creation.Source
@@ -76,7 +77,8 @@ class MapPartnerProcessor : AbstractProcessor() {
                             mapPartner,
                             kMaps.map { it.sourceToTargetAssignment() },
                             kMaps.filter { it.sourceToTargetImport != null }
-                                .map { it.sourceToTargetImport!! }
+                                .map { it.sourceToTargetImport!! },
+                            DIRECTION.TARGET,
                         ).writeTo(processingEnv.filer)
 
                         MapFile(
@@ -85,7 +87,8 @@ class MapPartnerProcessor : AbstractProcessor() {
                             mapPartner,
                             kMaps.map { it.targetToSourceAssignment() },
                             kMaps.filter { it.targetToSourceImport != null }
-                                .map { it.targetToSourceImport!! }
+                                .map { it.targetToSourceImport!! },
+                            DIRECTION.SOURCE,
                         ).writeTo(processingEnv.filer)
                     }
                 }
