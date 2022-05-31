@@ -12,6 +12,11 @@ annotation class KMap(
      */
     val value: String = "",
 
+    val thisValue: String = "",
+    val thisGet: String = "",
+
+    val thisSet: String = "",
+
     /**
      * The getter name of the map partner. Example:
      * ```

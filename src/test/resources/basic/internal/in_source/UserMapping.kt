@@ -1,6 +1,6 @@
-package basic.internal_in_target
+package basic.`internal`.in_source
 
 public fun User.toClient(): Client =
     Client().also {
-        it.age = age.value
+        it.age.value = age
     }

@@ -29,36 +29,57 @@ class InformedKMap(
      */
     private val kMap: KMap = sourceProperty.getAnnotation(KMap::class.java).apply {
         requireNotNull(this) { "The given source property must be annotated with KMap." }
+        if (thisValue != "") {
+            require(!((thisGet != "") and (thisSet != ""))) {
+                "KMap.thisValue is redundant when KMap.thisGet and KMap.thisSet are set."
+            }
+        }
         require(value == "" || othersGet == "" || othersSet == "") {
             "KMap.value is redundant when KMap.othersGet and KMap.othersSet are set."
         }
     }
 
+    private val propertyName = sourceProperty.simpleName.toString()
+
     /**
      * The getter of the source property.
      */
-    private val sourceGet: String = sourceProperty.simpleName.toString()
+    private val sourceGet: String = when {
+        kMap.thisGet == "" ->
+            if (kMap.thisValue == "") {
+                propertyName
+            } else {
+                kMap.thisValue
+            }
+        else -> kMap.thisGet
+    }
 
     /**
      * The setter of the source property.
      */
-    private val sourceSet: String = sourceProperty.simpleName.toString()
-
+    private val sourceSet: String = when {
+        kMap.thisSet == "" -> if (kMap.thisValue == "") {
+            propertyName
+        } else  {
+            kMap.thisValue
+        }
+        else -> kMap.thisGet
+    }
     /**
      * The getter of the target property.
      */
     private val targetGet: String = when {
         kMap.value == "" -> if (kMap.othersGet == "") {
-            sourceGet
+            propertyName
         } else {
             kMap.othersGet
         }
         kMap.othersGet == "" -> if (kMap.value == "") {
-            sourceGet
+            propertyName
         } else {
             kMap.value
         }
-        else -> sourceGet
+        else -> propertyName
     }
 
     /**
@@ -66,16 +87,16 @@ class InformedKMap(
      */
     private val targetSet: String = when {
         kMap.value == "" -> if (kMap.othersSet == "") {
-            sourceSet
+            propertyName
         } else {
             kMap.othersSet
         }
         kMap.othersSet == "" -> if (kMap.value == "") {
-            sourceSet
+            propertyName
         } else {
             kMap.value
         }
-        else -> sourceSet
+        else -> propertyName
     }
 
     private val importPackage: String? = mapPartner()?.packageName

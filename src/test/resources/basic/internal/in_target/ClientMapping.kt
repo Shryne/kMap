@@ -1,4 +1,4 @@
-package basic.internal_in_target
+package basic.`internal`.in_target
 
 public fun Client.toUser(): User =
     User().also {
